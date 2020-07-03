@@ -687,7 +687,8 @@ func init() {
 				return nil, fmt.Errorf("unable to create EOS block mapper: %w", err)
 			}
 
-			var startBlockResolvers []bstream.StartBlockResolver
+			var resolver bstream.StartBlockResolverFunc
+			//tracker := bstream.NewTracker(200)
 			blockmetaAddr := viper.GetString("common-blockmeta-addr")
 			if blockmetaAddr != "" {
 				conn, err := dgrpc.NewInternalClient(blockmetaAddr)
@@ -695,7 +696,7 @@ func init() {
 					userLog.Warn("cannot get grpc connection to blockmeta, disabling this startBlockResolver for search indexer", zap.Error(err), zap.String("blockmeta_addr", blockmetaAddr))
 				} else {
 					blockmetaCli := pbblockmeta.NewBlockIDClient(conn)
-					startBlockResolvers = append(startBlockResolvers, bstream.StartBlockResolverFunc(pbblockmeta.StartBlockResolver(blockmetaCli)))
+					resolver = bstream.StartBlockResolverFunc(pbblockmeta.StartBlockResolver(blockmetaCli))
 				}
 			}
 
@@ -704,10 +705,9 @@ func init() {
 			if err != nil {
 				userLog.Warn("cannot get setup blockstore, disabling this startBlockResolver for search indexer", zap.Error(err), zap.String("blocksStoreURL", blocksStoreURL))
 			} else {
-				startBlockResolvers = append(startBlockResolvers, codec.BlockstoreStartBlockResolver(blocksStore))
-			}
-			if len(startBlockResolvers) == 0 {
-				return nil, fmt.Errorf("no StartBlockResolver could be set for search indexer")
+				if resolver == nil {
+					resolver = codec.BlockstoreStartBlockResolver(blocksStore)
+				}
 			}
 
 			return indexerApp.New(&indexerApp.Config{
@@ -727,7 +727,7 @@ func init() {
 				BlocksStoreURL:        blocksStoreURL,
 			}, &indexerApp.Modules{
 				BlockMapper:        mapper,
-				StartBlockResolver: bstream.ParallelStartResolver(startBlockResolvers, -1),
+				StartBlockResolver: resolver,
 			}), nil
 		},
 	})
