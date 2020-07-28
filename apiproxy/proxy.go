@@ -19,6 +19,7 @@ type proxy struct {
 	httpsServer   *http.Server
 	dgraphqlProxy *httputil.ReverseProxy
 	eoswsProxy    *httputil.ReverseProxy
+	eosrestProxy  *httputil.ReverseProxy
 	nodeosProxy   *httputil.ReverseProxy
 	rootProxy     *httputil.ReverseProxy
 }
@@ -33,6 +34,7 @@ func newProxy(config *Config) *proxy {
 		config:        config,
 		dgraphqlProxy: createProxy(config.DgraphqlHTTPAddr),
 		eoswsProxy:    createProxy(config.EoswsHTTPAddr),
+		eosrestProxy:  createProxy(config.EosrestHTTPAddr),
 		nodeosProxy:   createProxy(config.NodeosHTTPAddr),
 		rootProxy:     createProxy(config.RootHTTPAddr),
 	}
@@ -59,8 +61,8 @@ func (p *proxy) Launch() error {
 	router.PathPrefix("/v1/chain/send_transaction").Handler(p.eoswsProxy)
 	router.PathPrefix("/v1/chain").Handler(p.nodeosProxy)
 	router.PathPrefix("/v1/stream").Handler(p.eoswsProxy)
-	router.PathPrefix("/v1").Handler(p.eoswsProxy)
-	router.PathPrefix("/v0").Handler(p.eoswsProxy)
+	router.PathPrefix("/v1").Handler(p.eosrestProxy)
+	router.PathPrefix("/v0").Handler(p.eosrestProxy)
 	router.PathPrefix("/").Handler(p.rootProxy)
 
 	p.httpServer = &http.Server{

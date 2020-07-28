@@ -37,6 +37,7 @@ const (
 	DgraphqlHTTPServingAddr     string = ":13023"
 	DgraphqlGrpcServingAddr     string = ":13024"
 	EoswsHTTPServingAddr        string = ":13026"
+	EosrestHTTPServingAddr      string = ":13033"
 	ForkresolverServingAddr     string = ":13027"
 	ForkresolverHTTPServingAddr string = ":13028"
 	FluxDBServingAddr           string = ":13029"
