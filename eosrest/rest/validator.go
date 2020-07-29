@@ -17,6 +17,6 @@ func validateBlocksRequest(r *http.Request) url.Values {
 func validateListRequest(r *http.Request) url.Values {
 	return validator.ValidateQueryParams(r, validator.Rules{
 		"limit":  []string{"required", "numeric_between:1,100"},
-		"cursor": []string{"eosrest.cursor"},
+		"cursor": []string{"eosws.cursor"},
 	})
 }
