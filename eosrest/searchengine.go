@@ -266,8 +266,8 @@ func validateSearchTransactionsRequest(r *http.Request) url.Values {
 		"start_block":     []string{"eos.blockNum", fmt.Sprintf("numeric_between:0,%d", math.MaxUint32)},
 		"block_count":     []string{"numeric", "numeric_between:1,"},
 		"limit":           []string{"numeric", "numeric_between:1,100"},
-		"cursor":          []string{"eosrest.cursor"},
-		"sort":            []string{"eosrest.search.sortOrder"},
+		"cursor":          []string{"eosws.cursor"},
+		"sort":            []string{"eosws.search.sortOrder"},
 		"with_reversible": []string{"in:true,false"},
 		"format":          []string{},
 	})
